@@ -103,6 +103,9 @@ def handle_dragging(event):
         dragging = False
         if can_place_shape(current_shape, current_position):
             place_shape_on_grid(current_shape, current_position)
+        else:
+            # Don't switch shape if the placement is invalid
+            pass
     elif event.type == pygame.MOUSEMOTION and dragging:
         x, y = event.pos
         new_position = [x // CELL_SIZE, y // CELL_SIZE]

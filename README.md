@@ -19,7 +19,7 @@ This is a simple **Block Blast** clone made with **Python** and **Pygame**. The 
 ### **Installation**
 1. Clone this repository to your local machine:
    ```bash
-   git clone https://github.com/yourusername/block-blast-clone.git
+   git clone https://github.com/Voltical/BlockBlast.git
    ```
 2. Install dependencies:
    ```bash

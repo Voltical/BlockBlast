@@ -78,9 +78,17 @@ def clear_full_lines():
 
 # Check if the shape can be placed at the given position
 def can_place_shape(shape, position):
+    if shape is None:  # If shape is not defined, return False
+        return False
     for block in shape:
         x, y = position[0] + block[1], position[1] + block[0]
-        if not (0 <= x < GRID_SIZE and 0 <= y < GRID_SIZE) or GRID[y][x] != 0:
+        # Debugging: print the coordinates of the block
+        print(f"Checking block at position: ({x}, {y})")  # Debug print
+        if not (0 <= x < GRID_SIZE and 0 <= y < GRID_SIZE):  # Check if within bounds
+            print(f"Block out of bounds: ({x}, {y})")  # Debug print
+            return False
+        if GRID[y][x] != 0:  # Check if grid position is occupied
+            print(f"Position already occupied: ({x}, {y})")  # Debug print
             return False
     return True
 
@@ -90,31 +98,46 @@ current_shape = None
 current_position = [0, 0]
 current_shape_name = ""
 
+# Store the previous shape if placement is unsuccessful
+previous_shape = None
+
 # Function to handle events like dragging shapes
 def handle_dragging(event):
-    global dragging, current_shape, current_position, current_shape_name
+    global dragging, current_shape, current_position, current_shape_name, previous_shape
 
     if event.type == pygame.MOUSEBUTTONDOWN:
         dragging = True
-        # Randomly pick a shape from SHAPES
-        current_shape_name = random.choice(list(SHAPES.keys()))  # Pick a random shape name
-        current_shape = SHAPES[current_shape_name]  # Get the corresponding shape
+        # Randomly pick a shape from SHAPES, but only if we don't already have one
+        if current_shape_name is None:
+            current_shape_name = random.choice(list(SHAPES.keys()))  # Pick a random shape name
+            current_shape = SHAPES[current_shape_name]  # Get the corresponding shape
+            print(f"Spawned new shape: {current_shape_name}")  # Debug print
+        else:
+            # If a shape already exists, reuse the previous one
+            current_shape = previous_shape
+            print(f"Reusing previous shape: {current_shape_name}")  # Debug print
     elif event.type == pygame.MOUSEBUTTONUP:
         dragging = False
-        if can_place_shape(current_shape, current_position):
+        if current_shape is not None and can_place_shape(current_shape, current_position):
             place_shape_on_grid(current_shape, current_position)
+            previous_shape = current_shape  # Save the successfully placed shape
+            current_shape_name = None  # Reset to allow for a new random shape to be picked next
+            current_shape = None  # Reset the current shape after placement
+            print(f"Placed shape: {current_shape_name}")  # Debug print
         else:
-            # Don't switch shape if the placement is invalid
-            pass
+            # Keep the previous shape, don't change
+            print("Shape placement failed.")  # Debug print
     elif event.type == pygame.MOUSEMOTION and dragging:
-        x, y = event.pos
-        new_position = [x // CELL_SIZE, y // CELL_SIZE]
-        
-        # Prevent moving the shape off-screen
-        if 0 <= new_position[0] < GRID_SIZE - max(block[1] for block in current_shape):
-            current_position[0] = new_position[0]
-        if 0 <= new_position[1] < GRID_SIZE - max(block[0] for block in current_shape):
-            current_position[1] = new_position[1]
+        # Only move the shape if it's defined
+        if current_shape is not None:
+            x, y = event.pos
+            new_position = [x // CELL_SIZE, y // CELL_SIZE]
+
+            # Prevent moving the shape off-screen
+            if 0 <= new_position[0] < GRID_SIZE - max(block[1] for block in current_shape):
+                current_position[0] = new_position[0]
+            if 0 <= new_position[1] < GRID_SIZE - max(block[0] for block in current_shape):
+                current_position[1] = new_position[1]
 
 # Main game loop
 def main():

@@ -1,5 +1,6 @@
 import pygame
 import sys
+import random  # Import the random module
 
 # Initialize Pygame
 pygame.init()
@@ -19,9 +20,9 @@ RED = (255, 0, 0)
 
 # Define some shapes
 SHAPES = {
-    "square": [[0, 0], [0, 1], [1, 0], [1, 1]],
-    "line": [[0, 0], [0, 1], [0, 2]],
-    "L": [[0, 0], [1, 0], [1, 1]]
+    "square": [[0, 0], [0, 1], [1, 0], [1, 1]],  # 2x2 square
+    "line": [[0, 0], [0, 1], [0, 2]],  # 1x3 line
+    "L": [[0, 0], [1, 0], [1, 1]],  # L-shape
 }
 
 # Grid state (10x10 grid of zeros)
@@ -77,7 +78,8 @@ def handle_dragging(event):
 
     if event.type == pygame.MOUSEBUTTONDOWN:
         dragging = True
-        current_shape = SHAPES["square"]  # Pick a shape for now
+        # Randomly pick a shape from SHAPES
+        current_shape = random.choice(list(SHAPES.values()))  # Pick a random shape
     elif event.type == pygame.MOUSEBUTTONUP:
         dragging = False
         place_shape_on_grid(current_shape, current_position)
